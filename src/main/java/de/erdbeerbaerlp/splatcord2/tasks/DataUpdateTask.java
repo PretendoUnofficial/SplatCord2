@@ -76,27 +76,33 @@ public class DataUpdateTask extends TimerTask {
             twcon2.setRequestProperty("User-Agent", Main.USER_AGENT);
             twcon2.connect();
             Main.splatNet2 = Main.gson.fromJson(new InputStreamReader(twcon2.getInputStream()), SplatNet.class);
+        } catch (Exception e) {
+            System.err.println("Failed loading splatoon 2 gears!");
+            e.printStackTrace();
+        }
+        try {
             final URL tworld3 = new URL("https://splatoon3.ink/data/gear.json");
             final HttpsURLConnection conn3 = (HttpsURLConnection) tworld3.openConnection();
             conn3.setRequestProperty("User-Agent", Main.USER_AGENT);
             conn3.connect();
             Main.splatNet3 = Main.gson.fromJson(new InputStreamReader(conn3.getInputStream()), SplatNet3.class);
-            System.out.println("Refreshing S3 translations...");
-            Main.translations.forEach((l, locale) -> {
-                try {
-                    final URL lng3 = new URL("https://splatoon3.ink/data/locale/" + l.s3Key + ".json");
-                    final HttpsURLConnection s3Conn = (HttpsURLConnection) lng3.openConnection();
-                    s3Conn.setRequestProperty("User-Agent", Main.USER_AGENT);
-                    s3Conn.connect();
-                    String o3 = new Scanner(s3Conn.getInputStream(), StandardCharsets.UTF_8).useDelimiter("\\A").next();
-                    locale.s3locales = Main.gson.fromJson(new StringReader(o3), S3Locale.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.err.println("Failed loading splatoon 3 gears!");
             e.printStackTrace();
         }
+        System.out.println("Refreshing S3 translations...");
+        Main.translations.forEach((l, locale) -> {
+            try {
+                final URL lng3 = new URL("https://splatoon3.ink/data/locale/" + l.s3Key + ".json");
+                final HttpsURLConnection s3Conn = (HttpsURLConnection) lng3.openConnection();
+                s3Conn.setRequestProperty("User-Agent", Main.USER_AGENT);
+                s3Conn.connect();
+                String o3 = new Scanner(s3Conn.getInputStream(), StandardCharsets.UTF_8).useDelimiter("\\A").next();
+                locale.s3locales = Main.gson.fromJson(new StringReader(o3), S3Locale.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         currentlyRunning = false;
     }
 
