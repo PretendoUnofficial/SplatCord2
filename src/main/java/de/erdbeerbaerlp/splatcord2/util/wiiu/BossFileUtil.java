@@ -8,6 +8,7 @@ import de.erdbeerbaerlp.splatcord2.storage.json.splatoon1.SplatfestByml;
 import de.erdbeerbaerlp.splatcord2.util.SSLBypass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -285,11 +286,14 @@ public class BossFileUtil {
         urlConnection.addRequestProperty("Accept", "application/xml");
         Document doc = b.parse(urlConnection.getInputStream());
         doc.getDocumentElement().normalize();
-        final Element files = (Element) doc.getDocumentElement().getElementsByTagName("Files").item(0);
-        final Element file = (Element) files.getElementsByTagName("File").item(0);
-
-        return getFestBymlDirect(file.getElementsByTagName("Url").item(0).getTextContent(), true);
-
+        final NodeList files = doc.getDocumentElement().getElementsByTagName("Files").item(0).getChildNodes();
+        for(int i = 0;i<files.getLength();i++) {
+            final Element file = (Element) ((Element)files).getElementsByTagName("File").item(i);
+            if(file.getElementsByTagName("Filename").item(0).getTextContent().equals("Festival.byaml")){
+                return getFestBymlDirect(file.getElementsByTagName("Url").item(0).getTextContent(), true);
+            }
+        }
+        return null;
     }
 
     public static SplatfestByml getFestBymlDirect(String url, boolean decrypt) throws Exception {
