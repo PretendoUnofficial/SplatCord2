@@ -2,7 +2,7 @@ package de.erdbeerbaerlp.splatcord2.storage.json.splatoon2.splatnet;
 
 public class Merchandise {
     public long price;
-    public long id;
+    public String id;
     public Skill skill;
     public long end_time;
     public Gear gear;
